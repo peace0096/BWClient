@@ -3,3 +3,32 @@
 
 #include "MyGameInstance.h"
 
+using namespace boost;
+using boost::asio::ip::tcp;
+
+void UMyGameInstance::Init()
+{
+	Super::Init();
+}
+
+void UMyGameInstance::ConnectToGameServer()
+{
+	memset(_recvBuffer, 0, RecvBufferSize);
+	boost::asio::io_context io_context;
+	_socket = new tcp::socket(io_context);
+	tcp::endpoint endpoint(asio::ip::make_address("127.0.0.1"), port);
+	_socket->async_connect(endpoint, boost::bind(&UMyGameInstance::OnConnect, this, asio::placeholders::error));
+
+}
+
+void UMyGameInstance::DisconnectFromGameServer()
+{
+}
+
+void UMyGameInstance::OnConnect(const boost::system::error_code& err)
+{
+	if (!err)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Success")));
+	}
+}
