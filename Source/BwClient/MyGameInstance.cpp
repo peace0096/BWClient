@@ -18,9 +18,6 @@ void UMyGameInstance::ConnectToGameServer()
 	_socket = new tcp::socket(io_context);
 	tcp::endpoint endpoint(asio::ip::make_address("127.0.0.1"), port);
 
-	tcp::socket socket1(io_context);
-	socket1.async_connect(endpoint, boost::bind(&UMyGameInstance::OnConnect, this, asio::placeholders::error));
-
 	_socket->async_connect(endpoint, boost::bind(&UMyGameInstance::OnConnect, this, asio::placeholders::error));
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Go")));
 	std::thread t(boost::bind(&boost::asio::io_context::run, &io_context));
@@ -29,6 +26,7 @@ void UMyGameInstance::ConnectToGameServer()
 
 void UMyGameInstance::DisconnectFromGameServer()
 {
+	
 }
 
 void UMyGameInstance::OnConnect(const boost::system::error_code& err)
@@ -36,11 +34,66 @@ void UMyGameInstance::OnConnect(const boost::system::error_code& err)
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Success")));
 	if (!err)
 	{
-		
+		AsyncRead();
 	}
 	else
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Fail")));
 	}
 
+}
+
+void UMyGameInstance::AsyncRead()
+{
+	memset(_recvBuffer, 0, RecvBufferSize);
+	_socket->async_read_some(
+		asio::buffer(
+			_recvBuffer, RecvBufferSize
+		),
+		boost::bind(
+			&UMyGameInstance::OnRead,
+			this,
+			asio::placeholders::error,
+			asio::placeholders::bytes_transferred
+		)
+	);
+}
+
+void UMyGameInstance::AsyncWrite(asio::mutable_buffer& buffer)
+{
+	asio::async_write(
+		_socket, 
+		buffer,
+		boost::bind(
+			&UMyGameInstance::OnWrite, 
+			this,
+			asio::placeholders::error, 
+			asio::placeholders::bytes_transferred
+		)
+	);
+}
+
+void UMyGameInstance::OnRead(const boost::system::error_code& err, size_t size)
+{
+	if (!err)
+	{
+		// TODO : 패킷 핸들 함수
+		AsyncRead();
+	}
+	else
+	{
+		// TODO Error 메세지
+	}
+}
+
+void UMyGameInstance::OnWrite(const boost::system::error_code& err, size_t size)
+{
+	if (!err)
+	{
+
+	}
+	else
+	{
+		// TODO Error 메세지
+	}
 }

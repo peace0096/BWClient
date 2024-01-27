@@ -33,6 +33,10 @@ public:
 
 private:
 	void OnConnect(const boost::system::error_code& err);
+	void AsyncRead();
+	void AsyncWrite(asio::mutable_buffer& buffer);
+	void OnRead(const boost::system::error_code& err, size_t size);
+	void OnWrite(const boost::system::error_code& err, size_t size);
 
 private:
 	static const int port = 4242;
