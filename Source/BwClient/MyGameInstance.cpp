@@ -3,9 +3,6 @@
 
 #include "MyGameInstance.h"
 
-using namespace boost;
-using boost::asio::ip::tcp;
-
 void UMyGameInstance::Init()
 {
 	Super::Init();
@@ -34,6 +31,7 @@ void UMyGameInstance::OnConnect(const boost::system::error_code& err)
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Success")));
 	if (!err)
 	{
+		//MakeLoginReq(1010);
 		AsyncRead();
 	}
 	else
@@ -62,7 +60,7 @@ void UMyGameInstance::AsyncRead()
 void UMyGameInstance::AsyncWrite(asio::mutable_buffer& buffer)
 {
 	asio::async_write(
-		_socket, 
+		*_socket, 
 		buffer,
 		boost::bind(
 			&UMyGameInstance::OnWrite, 
@@ -96,4 +94,47 @@ void UMyGameInstance::OnWrite(const boost::system::error_code& err, size_t size)
 	{
 		// TODO Error 메세지
 	}
+}
+
+// Packet 클래스로 변환 후 Deserialize
+void UMyGameInstance::HandlePacket(char* ptr, size_t size)
+{
+	asio::mutable_buffer buffer = asio::buffer(ptr, size);
+	int offset = 0;
+	PacketHeader header;
+	PacketUtil::ParseHeader(buffer, &header, offset);
+
+	// 헤더 코드 확인
+	std::cout << "HandlePacket " << message::MessageCode_Name(header.Code) << '\n';
+
+	switch (header.Code)
+	{
+	case message::MessageCode::LOGIN_RES:
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Login Success!")));
+		break;
+	}
+}
+
+void UMyGameInstance::MakeLoginReq(const int id)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("LoginReq Go..")));
+	message::LoginReq loginReq;
+	loginReq.set_id(id);
+	const size_t requiredSize = PacketUtil::RequiredSize(loginReq);
+	char* rawBuffer = new char[requiredSize];
+	auto buffer = asio::buffer(rawBuffer, requiredSize);
+
+	//if (!PacketUtil::Serialize(buffer, message::MessageCode::LOGIN_REQ, loginReq));
+	//{
+	//	// TODO : 패킷 잘못 적을 경우
+	//}
+	this->AsyncWrite(buffer);
+}
+
+void UMyGameInstance::HandleLoginRes(asio::mutable_buffer& buffer, const PacketHeader& header, int& offset)
+{
+	message::LoginRes msg;
+	PacketUtil::Parse(msg, buffer, buffer.size(), offset);
+
+	// 사실 할 거 없음.
 }

@@ -14,7 +14,6 @@ public class BwClient : ModuleRules
 
 		PrivateIncludePaths.AddRange(new string[]
 		{
-
 			"BwClient/",
 			"BwClient/Network/"
 		});

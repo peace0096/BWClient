@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include <string>
-#include <google/protobuf/port_def.inc>
 #include <boost/asio.hpp>
 #include <boost/bind/bind.hpp>
 #include <boost/asio/buffer.hpp>
+#include "Message.pb.h"
+#include "Packet.h"
 #include "MyGameInstance.generated.h"
 
 using namespace boost;
@@ -37,6 +38,15 @@ private:
 	void AsyncWrite(asio::mutable_buffer& buffer);
 	void OnRead(const boost::system::error_code& err, size_t size);
 	void OnWrite(const boost::system::error_code& err, size_t size);
+	void HandlePacket(char* ptr, size_t size);
+
+// 송신할 패킷 처리
+private:
+	void MakeLoginReq(const int id);
+
+// 수신받는 패킷 처리
+private:
+	void HandleLoginRes(asio::mutable_buffer& buffer, const PacketHeader& header, int& offset);
 
 private:
 	static const int port = 4242;
