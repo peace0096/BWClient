@@ -7,6 +7,8 @@
 #include <boost/bind/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/asio/buffer.hpp>
+#include "Packet.h"
+#include "Message.pb.h"
 
 class PacketSession;
 

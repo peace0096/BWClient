@@ -85,37 +85,37 @@ public:
 	}
 };
 
-int main()
-{
-	// 직렬화
-	Protocol::TEST test;
-	test.set_hp(10);
-	test.set_id(100);
-
-	const size_t requiredSize = PacketUtil::RequiredSize(test);
-	char* rawBuffer = new char[requiredSize];
-	const auto buffer = asio::buffer(rawBuffer, requiredSize);
-	PacketUtil::Serialize(buffer, TEST_PACKET, test);
-
-	// 역직렬화
-	PacketHeader header;
-	char* PacketBuffer = new char[4];
-	int offset = 0;
-	memcpy(PacketBuffer, rawBuffer, 4);
-	auto combinedBuffer = asio::buffer(PacketBuffer, 4);
-	PacketUtil::ParseHeader(combinedBuffer, &header, offset);
-	cout << header.Length << endl;
-	cout << header.Code << endl;
-	delete[] PacketBuffer;
-
-	PacketBuffer = new char[header.Length + sizeof(PacketHeader)];
-	memcpy(PacketBuffer, rawBuffer, offset + header.Length);
-	combinedBuffer = asio::buffer(PacketBuffer, sizeof(PacketHeader));
-
-	Protocol::TEST test2;
-	PacketUtil::Parse(test2, combinedBuffer, header.Length, offset);
-
-	std::cout << test2.hp() << endl;
-
-	return 0;
-}
+//int main()
+//{
+//	// 직렬화
+//	Protocol::TEST test;
+//	test.set_hp(10);
+//	test.set_id(100);
+//
+//	const size_t requiredSize = PacketUtil::RequiredSize(test);
+//	char* rawBuffer = new char[requiredSize];
+//	const auto buffer = asio::buffer(rawBuffer, requiredSize);
+//	PacketUtil::Serialize(buffer, TEST_PACKET, test);
+//
+//	// 역직렬화
+//	PacketHeader header;
+//	char* PacketBuffer = new char[4];
+//	int offset = 0;
+//	memcpy(PacketBuffer, rawBuffer, 4);
+//	auto combinedBuffer = asio::buffer(PacketBuffer, 4);
+//	PacketUtil::ParseHeader(combinedBuffer, &header, offset);
+//	cout << header.Length << endl;
+//	cout << header.Code << endl;
+//	delete[] PacketBuffer;
+//
+//	PacketBuffer = new char[header.Length + sizeof(PacketHeader)];
+//	memcpy(PacketBuffer, rawBuffer, offset + header.Length);
+//	combinedBuffer = asio::buffer(PacketBuffer, sizeof(PacketHeader));
+//
+//	Protocol::TEST test2;
+//	PacketUtil::Parse(test2, combinedBuffer, header.Length, offset);
+//
+//	std::cout << test2.hp() << endl;
+//
+//	return 0;
+//}

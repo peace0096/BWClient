@@ -31,34 +31,13 @@ public:
 
 	}
 
+	// 접속 함수
 	UFUNCTION(BlueprintCallable)
 	void ConnectToGameServer();
 
+	// 끊기
 	UFUNCTION(BlueprintCallable)
 	void DisconnectFromGameServer();
-
-//private:
-//	void OnConnect(const boost::system::error_code& err);
-//	void AsyncRead();
-//	void AsyncWrite(asio::mutable_buffer& buffer);
-//	void OnRead(const boost::system::error_code& err, size_t size);
-//	void OnWrite(const boost::system::error_code& err, size_t size);
-//	void HandlePacket(char* ptr, size_t size);
-//
-//// 송신할 패킷 처리
-//private:
-//	void MakeLoginReq(const int id);
-//
-//// 수신받는 패킷 처리
-//private:
-//	void HandleLoginRes(asio::mutable_buffer& buffer, const PacketHeader& header, int& offset);
-//
-//private:
-//	static const int port = 4242;
-//	static const int RecvBufferSize = 1024;
-//	tcp::socket* _socket;
-//	char _recvBuffer[RecvBufferSize];
-//	std::string _sendMsg;
 
 private:
 	PacketSessionRef GameSession;

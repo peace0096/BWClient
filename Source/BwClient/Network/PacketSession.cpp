@@ -35,6 +35,7 @@ void PacketSession::OnConnect(const boost::system::error_code& err)
 	if (!err)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Connection Success")));
+		MakeLoginReq(1000);
 	}
 	else
 	{
@@ -81,4 +82,38 @@ void PacketSession::OnRead(const boost::system::error_code& err, size_t size)
 	{
 		// TODO : Error
 	}
+}
+
+void PacketSession::HandlePacket(char* ptr, size_t size)
+{
+	asio::mutable_buffer buffer = asio::buffer(ptr, size);
+	int offset = 0;
+	PacketHeader header;
+	PacketUtil::ParseHeader(buffer, &header, offset);
+	
+	// 헤더 코드 확인
+	std::cout << "HandlePacket " << message::MessageCode_Name(header.Code) << '\n';
+	
+	switch (header.Code)
+	{
+	case message::MessageCode::LOGIN_RES:
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Login Success!")));
+		break;
+	}
+}
+
+void PacketSession::MakeLoginReq(const int id)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("LoginReq Go..")));
+	message::LoginReq loginReq;
+	loginReq.set_id(id);
+	const size_t requiredSize = PacketUtil::RequiredSize(loginReq);
+	char* rawBuffer = new char[requiredSize];
+	auto buffer = asio::buffer(rawBuffer, requiredSize);
+
+	//if (!PacketUtil::Serialize(buffer, message::MessageCode::LOGIN_REQ, loginReq));
+	//{
+	//	// TODO : 패킷 잘못 적을 경우
+	//}
+	this->AsyncWrite(buffer);
 }
