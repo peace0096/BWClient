@@ -7,7 +7,7 @@
 /**
  * 
  */
-class BWCLIENT_API PacketSession
+class BWCLIENT_API PacketSession : public TSharedFromThis<PacketSession>
 {
 public:
 	PacketSession(asio::io_context& io_context) : _socket(io_context)
@@ -18,6 +18,8 @@ public:
 	~PacketSession()
 	{
 	}
+
+	void Run(asio::io_context& io_context);
 
 	void Connect(std::string host, int port);
 
@@ -47,4 +49,5 @@ private:
 	tcp::socket _socket;
 	char _recvBuffer[RecvBufferSize];
 	std::string _sendMsg;
+	TSharedPtr<class NetworkWorker> NetworkThread;
 };

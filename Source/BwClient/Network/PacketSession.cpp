@@ -2,6 +2,14 @@
 
 
 #include "Network/PacketSession.h"
+#include "NetworkWorker.h"
+
+void PacketSession::Run(asio::io_context& io_context)
+{
+	
+	NetworkThread = MakeShared<NetworkWorker>(io_context, AsShared());
+
+}
 
 void PacketSession::Connect(std::string host, int port)
 {
@@ -40,6 +48,11 @@ void PacketSession::OnConnect(const boost::system::error_code& err)
 	else
 	{
 		// TODO : Error Code
+		// Use FString::Printf with converted string
+		FString formattedString = FString::Printf(TEXT("%s"), *FString(UTF8_TO_TCHAR(err.message().c_str())));
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *formattedString);
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, formattedString);
 	}
 }
 
