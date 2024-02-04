@@ -40,6 +40,6 @@ public:
 	void DisconnectFromGameServer();
 
 private:
-	tcp::socket* _sock;
 	PacketSessionRef GameSession;
+	PacketSession* session;
 };

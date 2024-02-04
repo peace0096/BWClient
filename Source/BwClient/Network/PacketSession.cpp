@@ -4,11 +4,11 @@
 #include "Network/PacketSession.h"
 #include "NetworkWorker.h"
 
-void PacketSession::Run(asio::io_context& io_context)
-{
-	
-	NetworkThread = MakeShared<NetworkWorker>(io_context, AsShared());
 
+
+void PacketSession::Run(TSharedPtr<asio::io_context> io_context)
+{
+	NetworkThread = MakeShared<NetworkWorker>(io_context, AsShared());
 }
 
 void PacketSession::Connect(std::string host, int port)

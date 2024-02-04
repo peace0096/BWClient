@@ -15,11 +15,18 @@ public:
 		memset(_recvBuffer, 0, RecvBufferSize);
 	}
 
+	PacketSession(TSharedPtr<asio::io_context> io_context) : _socket(*io_context.Get())
+	{
+		memset(_recvBuffer, 0, RecvBufferSize);
+	}
+
 	~PacketSession()
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("~PacketSession()")));
 	}
 
 	void Run(asio::io_context& io_context);
+	void Run(TSharedPtr<asio::io_context> io_context);
 
 	void Connect(std::string host, int port);
 

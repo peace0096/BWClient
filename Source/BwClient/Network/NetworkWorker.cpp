@@ -4,14 +4,15 @@
 #include "Network/NetworkWorker.h"
 
 
-NetworkWorker::NetworkWorker(asio::io_context& io_context, TSharedPtr<PacketSession> Session)
-	: _io_context(io_context), SessionRef(Session)
+NetworkWorker::NetworkWorker(TSharedPtr<asio::io_context> io_context, TSharedPtr<PacketSession> Session)
+	: io_contextRef(io_context), SessionRef(Session)
 {
 	Thread = FRunnableThread::Create(this, TEXT("NetworkWorker"));
 }
 
 NetworkWorker::~NetworkWorker()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("~NetworkWorker()")));
 }
 
 bool NetworkWorker::Init()
@@ -26,17 +27,16 @@ uint32 NetworkWorker::Run()
 	try
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Network Thread Running")));
-
-		_io_context.run();
-		while (true)
-		{
-		}
+		io_contextRef->run();
 ;		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Network Thread Done")));
 		
 	}
-	catch (const std::exception&)
+	catch (const std::exception& e)
 	{
-		
+		FString formattedString = FString::Printf(TEXT("%s"), *FString(UTF8_TO_TCHAR(e.what())));
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *formattedString);
+
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, formattedString);
 	}
 	return 0;
 }

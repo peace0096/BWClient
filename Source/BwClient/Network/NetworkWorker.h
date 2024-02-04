@@ -13,7 +13,7 @@ class Packetsession;
 class BWCLIENT_API NetworkWorker : public FRunnable
 {
 public:
-	NetworkWorker(asio::io_context& io_context, TSharedPtr<PacketSession> Session);
+	NetworkWorker(TSharedPtr<asio::io_context> io_context, TSharedPtr<PacketSession> Session);
 	~NetworkWorker();
 
 	// 가상함수 (Override)
@@ -33,7 +33,7 @@ protected:
 
 	// 소켓 & 세션 멤버 
 	TWeakPtr<class PacketSession> SessionRef;
-	asio::io_context& _io_context;
+	TSharedPtr<asio::io_context> io_contextRef;
 
 	
 };
